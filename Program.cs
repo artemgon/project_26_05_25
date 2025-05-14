@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.IO;
 
 namespace project_26_05_25
 {
@@ -7,43 +8,30 @@ namespace project_26_05_25
     {
         static void Main()
         {
-            Thread numThread = new (GenerateNumbers) { Priority = ThreadPriority.Normal };
-            Thread letterThread = new(GenerateLetters) { Priority = ThreadPriority.AboveNormal };
-            Thread symbThread = new(GenerateSymbols) { Priority = ThreadPriority.BelowNormal };
+            Console.Write("Enter source directory: ");
+            string source = Console.ReadLine() ?? string.Empty;
+            Console.Write("Enter destination directory: ");
+            string dest = Console.ReadLine() ?? string.Empty;
 
-            numThread.Start();
-            letterThread.Start();
-            symbThread.Start();
-
-            numThread.Join();
-            letterThread.Join();
-            symbThread.Join();
+            CopyDirectory(source, dest);
+            Console.WriteLine("Directory is copied!");
         }
 
-        static void GenerateNumbers()
+        static void CopyDirectory(string source, string dest)
         {
-            for (int i = 0; i < 10; i++)
+            Directory.CreateDirectory(dest);
+
+            foreach (string file in Directory.GetFiles(source))
             {
-                Console.WriteLine(i);
-                Thread.Sleep(100);
+                string fileName = Path.GetFileName(file);
+                File.Copy(file, Path.Combine(dest, fileName), true);
+                Console.WriteLine($"Copied: {fileName}");
             }
-        }
 
-        static void GenerateLetters()
-        {
-            for (char c = 'A'; c <= 'Z'; c++)
+            foreach (string dir in Directory.GetDirectories(source))
             {
-                Console.WriteLine(c);
-                Thread.Sleep(100);
-            }
-        }
-
-        static void GenerateSymbols()
-        {
-            for (char c = '!'; c <= '/'; c++)
-            {
-                Console.WriteLine(c);
-                Thread.Sleep(100);
+                string dirName = Path.GetFileName(dir);
+                CopyDirectory(dir, Path.Combine(dest, dirName));
             }
         }
     }
