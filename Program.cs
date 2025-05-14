@@ -1,38 +1,32 @@
 ﻿using System;
 using System.Threading;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace project_26_05_25
 {
     public class Program
     {
-        static void Main()
+        static async Task Main()
         {
-            Console.Write("Enter source directory: ");
-            string source = Console.ReadLine() ?? string.Empty;
-            Console.Write("Enter destination directory: ");
-            string dest = Console.ReadLine() ?? string.Empty;
+            Console.Write("Enter a number: ");
+            int n = int.Parse(Console.ReadLine() ?? "0");
 
-            CopyDirectory(source, dest);
-            Console.WriteLine("Directory is copied!");
+            long result = await CalculateFactorialAsync(n);
+            Console.WriteLine($"Factorial of {n} is {result}");
         }
 
-        static void CopyDirectory(string source, string dest)
+        static async Task<long> CalculateFactorialAsync(int n)
         {
-            Directory.CreateDirectory(dest);
-
-            foreach (string file in Directory.GetFiles(source))
+            return await Task.Run(() =>
             {
-                string fileName = Path.GetFileName(file);
-                File.Copy(file, Path.Combine(dest, fileName), true);
-                Console.WriteLine($"Copied: {fileName}");
-            }
-
-            foreach (string dir in Directory.GetDirectories(source))
-            {
-                string dirName = Path.GetFileName(dir);
-                CopyDirectory(dir, Path.Combine(dest, dirName));
-            }
+                long result = 1;
+                for (int i = 1; i <= n; i++)
+                {
+                    result *= i;
+                }
+                return result;
+            });
         }
     }
 }
